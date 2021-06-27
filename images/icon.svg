@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" width="1024" height="1024" viewBox="0 0 10 10">
+	<style>
+text {
+	font-family: Ubuntu;
+}
+	</style>
+	<circle cx="5" cy="5" r="4" fill="red"/>
+	<text y="4.2" stroke-width="0.1" font-size="3.5">
+		<tspan x="2.4" dy="0">R &amp;</tspan>
+		<tspan x="2.8" dy="3.6">TV</tspan>
+	</text>
+</svg>
