@@ -4,18 +4,22 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
 
-AC_CHECK_PROGS(PYRCC, [pyrcc, pyrcc5])
-if test "$PYRCC" = ""; then 
-	AC_MSG_ERROR([Qt utility program pyrcc5 is required.])
-else
-	PYRCCVERSION=`pyrcc -version`
-	IFS=" "; PYRCCVERSION=($PYRCCVERSION); unset IFS
-	#if test ${PYRCCVERSION[0]} = "pyrcc5"; then
-	#	AC_MSG_ERROR([Qt utility program pyrcc5 has version ${PYRCCVERSION[1]}, but at least version v5.0.0 is required])
-	#fi
-fi
+AC_ARG_VAR([PYRCC], [The name or full path of pyrcc. Version 5 is required.])
+
+AC_PROG_GREP
+AC_CHECK_PROGS([PYRCC], [pyrcc5 pyrcc], [])
+AS_IF([test "x${PYRCC}" = x],
+	[AC_MSG_ERROR([Required program pyrcc5 was not found])])
+
+AC_MSG_CHECKING([whether ${PYRCC} has an appropriate version])
+AS_IF([test $(pyrcc5 -version 2>&1 | cut -dv -f2 | cut -d"." -f1) -ne "5"], [
+	AC_MSG_RESULT([no])
+	AC_MSG_ERROR([pyrcc version 5.x.x is required, but ${PYRCC} is a different version])
+], [
+  AC_MSG_RESULT([yes])
+])
 
 
 AM_PATH_PYTHON([3.6])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile tabs/Makefile])
 AC_OUTPUT
