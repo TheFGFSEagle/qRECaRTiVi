@@ -872,7 +872,8 @@ resources.py: resources.qrc
 all: resources.py
 
 run:
-	PYTHONPATH=${PYTHONPATH}:$(abs_srcdir); ./qrecartivi
+	@echo "Running qrecartivi"
+	@PYTHONPATH=${PYTHONPATH}:$(abs_srcdir)/..; ./qrecartivi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

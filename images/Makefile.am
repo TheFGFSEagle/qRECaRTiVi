@@ -1,6 +1,6 @@
 icon.png: icon.svg
 	@echo "CONVERT $<"
-	@$CONVERT $< $@
+	@$(CONVERT) $< $@
 
 all: icon.png
 CLEANFILES = icon.png

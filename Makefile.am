@@ -15,4 +15,5 @@ all: resources.py
 CLEANFILES = resources.py
 
 run:
-	PYTHONPATH=${PYTHONPATH}:$(abs_srcdir); ./qrecartivi
+	@echo "Running qrecartivi"
+	@PYTHONPATH=${PYTHONPATH}:$(abs_srcdir)/..; ./qrecartivi
