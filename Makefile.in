@@ -239,6 +239,7 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+CONVERT = @CONVERT@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 ECHO_C = @ECHO_C@
@@ -317,12 +318,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = tabs
+SUBDIRS = tabs images
 AUTOMAKE_OPTIONS = gnu
 ACLOCAL_AMFLAGS = -I m4
 bin_SCRIPTS = qrecartivi
 pymoddir = $(pythondir)/$(PACKAGE)
 nobase_pymod_PYTHON = application.py __init__.py mainwindow.py menus.py trayicon.py utils.py resources.py
+CLEANFILES = resources.py
 all: all-recursive
 
 .SUFFIXES:
@@ -764,6 +766,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -863,10 +866,11 @@ uninstall-am: uninstall-binSCRIPTS uninstall-nobase_pymodPYTHON
 .PRECIOUS: Makefile
 
 export pymoddir
-
 resources.py: resources.qrc
 	@echo "PYRCC $<"
 	@ $(PYRCC) $< -o $@ -compress 9
+
+all: resources.py
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

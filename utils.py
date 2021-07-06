@@ -27,8 +27,26 @@ Keyword arguments:
 		func(*args, **kwargs)
 	return call
 
+def logFuncNameAndArgs(func):
+	@functools.wraps(func)
+	def call(*args, **kwargs):
+		message = f"\n\nCalling {func.__qualname__.replace('__main__.', '')}"
+		if len(args) + len(kwargs.keys()) == 0:
+			message += " without arguments"
+		if len(args) > 0:
+			message += f"""\n
+Positional arguments:
+{' '.join(map(repr, args))}"""
+		if len(kwargs.keys()) > 0:
+			message += f"""\n
+Keyword arguments:
+{' '.join([f'{key} : {repr(value.strip())}' for key, value in kwargs.items()])}"""
+		logging.debug(message)
+		func(*args, **kwargs)
+	return call
+
 # create a function synonyme
-qreclog = logFuncNameAndArgs
+qreclog = logFunctionOrMethodNameAndArgs
 
 
 def getDatadir():

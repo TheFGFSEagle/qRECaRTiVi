@@ -19,7 +19,15 @@ AS_IF([test $(pyrcc5 -version 2>&1 | cut -dv -f2 | cut -d"." -f1) -ne "5"], [
   AC_MSG_RESULT([yes])
 ])
 
+AC_CHECK_PROGS([CONVERT], [convert magick], [])
+AS_IF([test "x${CONVERT}" = x],
+	[AC_MSG_ERROR([Required program pyrcc5 was not found])])
+
+AS_IF([test ${CONVERT} = "magick"], [
+		CONVERT="magick convert"
+	], [])
+
 
 AM_PATH_PYTHON([3.6])
-AC_CONFIG_FILES([Makefile tabs/Makefile])
+AC_CONFIG_FILES([Makefile tabs/Makefile images/Makefile])
 AC_OUTPUT
