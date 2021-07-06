@@ -1,5 +1,4 @@
 SUBDIRS = tabs images
-AUTOMAKE_OPTIONS = gnu
 ACLOCAL_AMFLAGS = -I m4
 
 bin_SCRIPTS = qrecartivi
@@ -16,4 +15,4 @@ all: resources.py
 CLEANFILES = resources.py
 
 run:
-	PYTHONPATH=$PYTHONPATH:
+	PYTHONPATH=${PYTHONPATH}:$(abs_srcdir); ./qrecartivi

@@ -596,8 +596,8 @@ PYTHON_EXEC_PREFIX
 PYTHON_PREFIX
 PYTHON_VERSION
 PYTHON
-CONVERT
 GREP
+CONVERT
 PYRCC
 AM_BACKSLASH
 AM_DEFAULT_VERBOSITY
@@ -674,6 +674,7 @@ enable_silent_rules
 host_alias
 target_alias
 PYRCC
+CONVERT
 PYTHON'
 
 
@@ -1305,6 +1306,7 @@ Optional Features:
 
 Some influential environment variables:
   PYRCC       The name or full path of pyrcc. Version 5 is required.
+  CONVERT     The name or full path of convert / magick.
   PYTHON      the Python interpreter
 
 Use these variables to override the choices made by `configure' or to help
@@ -2352,6 +2354,7 @@ fi
 
 
 
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
 $as_echo_n "checking for grep that handles long lines and -e... " >&6; }
 if ${ac_cv_path_GREP+:} false; then :
@@ -2519,10 +2522,10 @@ fi
 done
 
 if test "x${CONVERT}" = x; then :
-  as_fn_error $? "Required program pyrcc5 was not found" "$LINENO" 5
+  as_fn_error $? "Required program convert / magick was not found" "$LINENO" 5
 fi
 
-if test ${CONVERT} = "magick"; then :
+if test ${CONVERT} = magick*; then :
 
 		CONVERT="magick convert"
 
