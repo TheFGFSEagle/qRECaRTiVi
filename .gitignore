@@ -1,14 +1,10 @@
-aclocal.m4
 config.log
 config.status
-resources.python3
+resources.py
 m4/
 .git/
 autom4te.cache/
 Makefile
-Makefile.in
 tabs/Makefile
-tabs/Makefile.in
 images/icon.png
 images/Makefile
-images/Makefile.in
