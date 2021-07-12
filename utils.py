@@ -4,6 +4,7 @@
 import os
 import functools
 import logging
+import inspect
 
 from PyQt5.QtCore import QStandardPaths
 
@@ -30,7 +31,7 @@ Keyword arguments:
 # create a function synonyme
 qreclog = logFunctionOrMethodNameAndArgs
 
-
+@qreclog
 def getDatadir():
 	"""Returns a path to the directory where data files should be saved
 	"""
@@ -45,6 +46,7 @@ def getDatadir():
 	
 	return datadir
 
+@qreclog
 def isPath(s):
 	"""Finds out whether a string is an URL or a path
 	@param s string containing a path or url

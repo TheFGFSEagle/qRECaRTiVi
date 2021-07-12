@@ -2,14 +2,19 @@
 #-*-coding: utf-8-*-
 
 import sys
+import logging
 
-if sys.version_info[0:2] < (3, 2):
-	print("Sorry, but this application requires to be run with Python 3.2 or newer. Exiting")
+logging.basicConfig(
+	format='\n\n%(levelname)s at %(asctime)s from %(pathname)s:%(lineno)d: %(message)s',
+	level=logging.WARNING
+)
+
+if sys.version_info[0:2] < (3, 6):
+	logging.fatal("Sorry, but this application requires to be run with Python 3.6 or newer. Exiting")
 	sys.exit(1)
 
 import signal
-import logging
-logging.basicConfig(format='\n\n%(levelname)s at %(asctime)s from %(pathname)s:%(lineno)d: %(message)s', level=logging.DEBUG)
+
 
 from PyQt5 import QtWidgets
 

@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 #-*-coding: utf-8-*-
 
-import sys, os
+import sys
+import os
+import logging
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -30,23 +32,32 @@ class Application(QApplication):
 		self.setStyleSheet(QTextStream(sFile).readAll())
 		sFile.close()
 		
-		self.setupArgParser()
-		self.procArgs()
+		self.getCommandLineArgs()
 		
 		self.settings = QSettings()
 		self.fontSize = self.settings.value("LookAndFeel/FontSize", 13)
 		self.fontFamily = self.settings.value("LookAndFeel/FontFamily", "Ubuntu")
 		self.setFont(QFont(self.fontFamily, self.fontSize))
 	
-	def procArgs(self):
-		pass
-	
 	def quit(self, *args, **kwargs):
 		QApplication.quit()
 	
-	def setupArgParser(self):
+	def getCommandLineArgs(self):
 		self.argp = QCommandLineParser()
 		self.argp.addHelpOption()
 		self.argp.addVersionOption()
 		self.argp.setApplicationDescription("qRECaRTiVi - records any audio / video stream and downloads podcasts from RSS files")
+		
+		logLevelOption = QCommandLineOption("loglevel", "Set logging level (one of DEBUG, INFO, WARNING, ERROR, FATAL)", "LOGLEVEL", "INFO")
+		self.argp.addOption(logLevelOption)
+		
 		self.argp.process(self)
+		
+		self.cmdArgs = {}
+		self.cmdArgs["loglevel"] = self.argp.value("loglevel").upper()
+		
+		if self.cmdArgs["loglevel"] not in ["DEBUG", "INFO", "WARNING", "ERROR", "FATAL"]:
+			print(f"Loglevel {self.argp.value(logLevelOption)} is not one of DEBUG, INFO, WARNING, ERROR, FATAL - using default of ERROR")
+			self.cmdArgs["loglevel"] = "ERROR"
+		
+

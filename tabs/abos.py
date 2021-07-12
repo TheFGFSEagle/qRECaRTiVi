@@ -7,6 +7,7 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 import SimpleQt as SQt
+
 from qrecartivi import utils
 
 logger = logging.getLogger()
@@ -15,6 +16,7 @@ logger = logging.getLogger()
 class ChannelData(object):
 	"""Data class for a channel
 	"""
+	@utils.qreclog
 	def __init__(self, name, owner, description, episodes, image=None):
 		object.__init__(self)
 		
@@ -28,6 +30,7 @@ class ChannelData(object):
 class ChannelEpisodeData(object):
 	"""Data class for a channel's episode
 	"""
+	@utils.qreclog
 	def __init__(self, title, date, time, duration, author, owner, description, image=None):
 		object.__init__(self)
 		
@@ -66,6 +69,7 @@ class ChannelWidget(QListWidgetItem):
 
 
 class ChannelEpisodeWidget(SQt.HBox):
+	@utils.qreclog
 	def __init__(self, data, **kwargs):
 		SQt.HBox.__init__(self, **kwargs)
 		
@@ -76,6 +80,7 @@ class ChannelEpisodeWidget(SQt.HBox):
 
 
 class AbosTab(QSplitter):
+	@utils.qreclog
 	def __init__(self, parent=None):
 		QSplitter.__init__(self, parent)
 		
@@ -92,21 +97,23 @@ class AbosTab(QSplitter):
 		self.channelDetailsView = SQt.VBox(parent=self.channelDetailsSplitter)
 		self.channelDetailsSplitter.addWidget(self.channelDetailsView)
 	
+	@utils.qreclog
 	def updateAboList(self):
 		"""
 		Reload the list of channels
 		"""
 		self.channelsView.clear()
 		for channel in self.channels:
-			channelWidget = ChannelWidget(channel, self)
+			channelWidget = ChannelWidget(channel, self.channelsView)
 			self.channelsView.addWidget(channelWidget)
 	
+	@utils.qreclog
 	def displayChannelDetails(self, channel):
 		"""Display the episodes of a channel in self.channelListView
 		@param channel ChannelData instance
 		"""
 		self.episodesView.clearChildren()
 		for episode in channel.episodes:
-			episodeWidget = ChannelEpisodeWidget(episode, parent=self)
+			episodeWidget = ChannelEpisodeWidget(episode, parent=self.episodesView)
 			self.episodesView.addWidget(episodeWidget)
 		# TODO: add code to display channel information in self.channelDetailsView
