@@ -23,9 +23,9 @@ Positional arguments:
 		if len(kwargs.keys()) > 0:
 			message += f"""\n
 Keyword arguments:
-{' '.join([f'{key} : {repr(value.strip())}' for key, value in kwargs.items()])}"""
+{' '.join([f'{key} : {repr(value).strip()}' for key, value in kwargs.items()])}"""
 		logging.debug(message)
-		func(*args, **kwargs)
+		return func(*args, **kwargs)
 	return call
 
 # create a function synonyme
@@ -56,9 +56,11 @@ def isPath(s):
 		return True
 	elif s.startswith("/"): # clearly a path, urls never start with a slash
 		return True
+	elif s.startswith("file://"):
+		return True
 	elif "://" in s.split(".")[0]: # if a protocol is present, it's an url
 		return False
-	elif "localhost" in s: # special case for localhost domain name where splits on . would fail
+	elif "localhost" in s[:30]: # special case for localhost domain name where splits on . would fail
 		return False
 	elif len(s.split("/")[0].split(".")) > 1: # dots before the first slash, normally separating TLD and domain name
 		return False

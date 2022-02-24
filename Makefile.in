@@ -865,7 +865,7 @@ uninstall-am: uninstall-binSCRIPTS uninstall-nobase_pymodPYTHON
 .PRECIOUS: Makefile
 
 export pymoddir
-resources.py: resources.qrc
+resources.py: resources.qrc style.qss images/icon.png
 	@echo "PYRCC $<"
 	@ $(PYRCC) $< -o $@ -compress 9
 

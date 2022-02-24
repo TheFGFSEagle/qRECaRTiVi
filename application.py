@@ -21,16 +21,12 @@ class Application(QApplication):
 		sFile = QFile(":/style.qss")
 		sFile.open(QIODevice.ReadOnly)
 		self.setStyleSheet(QTextStream(sFile).readAll())
+		sFile.close()
 		
 		self.setOrganizationName("Geisbergium")
 		self.setApplicationName("qRECaRTiVi")
 		self.setApplicationVersion("1.0")
 		self.loc = os.path.dirname(os.path.abspath(__file__)) + "/"
-		
-		sFile = QFile(":/style.qss")
-		sFile.open(QIODevice.ReadOnly)
-		self.setStyleSheet(QTextStream(sFile).readAll())
-		sFile.close()
 		
 		self.getCommandLineArgs()
 		
@@ -57,7 +53,6 @@ class Application(QApplication):
 		self.cmdArgs["loglevel"] = self.argp.value("loglevel").upper()
 		
 		if self.cmdArgs["loglevel"] not in ["DEBUG", "INFO", "WARNING", "ERROR", "FATAL"]:
-			print(f"Loglevel {self.argp.value(logLevelOption)} is not one of DEBUG, INFO, WARNING, ERROR, FATAL - using default of ERROR")
-			self.cmdArgs["loglevel"] = "ERROR"
-		
+			print(f"Loglevel {self.argp.value(logLevelOption)} is not one of DEBUG, INFO, WARNING, ERROR, FATAL - using default of WARNING")
+			self.cmdArgs["loglevel"] = "WARNING"
 
