@@ -28,7 +28,7 @@ Keyword arguments:
 		return func(*args, **kwargs)
 	return call
 
-# create a function synonyme
+# shorthand
 qreclog = logFunctionOrMethodNameAndArgs
 
 @qreclog

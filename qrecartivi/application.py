@@ -35,6 +35,21 @@ class Application(QApplication):
 		self.fontFamily = self.settings.value("LookAndFeel/FontFamily", "Ubuntu")
 		self.setFont(QFont(self.fontFamily, self.fontSize))
 	
+	def showStatusMessage(self, message, level):
+		getattr(
+			logging,
+			{
+				logging.DEBUG:		"debug",
+				logging.INFO:		"info",
+				logging.WARN:		"warn",
+				logging.ERROR:		"error",
+				logging.FATAL:		"fatal",
+			}[level]
+		)(message)
+		
+		if hasattr(qApp, "mainwindow"):
+			qApp.mainWindow.sBar.showMessage(message, level)
+	
 	def quit(self, *args, **kwargs):
 		QApplication.quit()
 	
@@ -52,7 +67,7 @@ class Application(QApplication):
 		self.cmdArgs = {}
 		self.cmdArgs["loglevel"] = self.argp.value("loglevel").upper()
 		
-		if self.cmdArgs["loglevel"] not in ["DEBUG", "INFO", "WARNING", "ERROR", "FATAL"]:
-			print(f"Loglevel {self.argp.value(logLevelOption)} is not one of DEBUG, INFO, WARNING, ERROR, FATAL - using default of WARNING")
-			self.cmdArgs["loglevel"] = "WARNING"
-
+		if self.cmdArgs["loglevel"] not in ["DEBUG", "INFO", "WARN", "ERROR", "FATAL"]:
+			print(f"Loglevel {self.argp.value(logLevelOption)} is not one of DEBUG, INFO, WARN, ERROR, FATAL - using default of WARNING")
+			self.cmdArgs["loglevel"] = "WARN"
+		

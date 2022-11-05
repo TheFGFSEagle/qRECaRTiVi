@@ -8,42 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 import SimpleQt as SQt
 
-from qrecartivi import utils
-
-logger = logging.getLogger()
-
-
-class ChannelData(object):
-	"""Data class for a channel
-	"""
-	@utils.qreclog
-	def __init__(self, name, owner, description, episodes, image=None):
-		object.__init__(self)
-		
-		self.name = name
-		self.owner = owner
-		self.description = description
-		# TODO: add thumbnail displaying support
-		self.image = image
-		self.episodes = episodes
-		self.attrs = list(vars(self))
-
-
-class ChannelEpisodeData(object):
-	"""Data class for a channel's episode
-	"""
-	@utils.qreclog
-	def __init__(self, title, date, time, duration, author, owner, description, image=None):
-		object.__init__(self)
-		
-		self.title = title
-		self.date = date
-		self.time = time
-		self.duration = duration
-		self.author = author
-		self.owner = owner
-		self.description = description
-		self.attrs = list(vars(self))
+from qrecartivi import utils, struct
 
 
 class ChannelWidget(QWidget):
@@ -113,10 +78,22 @@ class ChannelsView(QTableWidget):
 		self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 		self.setShowGrid(False)
 	
+	def createItems(self):
+		self.setRowCount(len(self.parent.channels))
+		
+		for rowIndex, channel in enumerate(self.parent.channels):
+			channelWidget = ChannelWidget(self.parent.channels[rowIndex], parent=self)
+			channelWidget.addItems(self, rowIndex)
+	
 	@utils.qreclog
 	def onItemSelectionChanged(self):
-		selectedItem = self.selectedItems()[0]
-		self.parent.displayChannelDetails(selectedItem.row())
+		selectedItems = self.selectedItems()
+		if len(selectedItems) > 0:
+			selectedItem = selectedItems[0]
+			self.parent.displayChannelDetails(selectedItem.row())
+		else:
+			self.selectRow(0)
+			self.parent.displayChannelDetails(0)
 
 
 class EpisodesView(QTableWidget):
@@ -137,10 +114,22 @@ class EpisodesView(QTableWidget):
 		self.setEditTriggers(QAbstractItemView.NoEditTriggers)
 		self.setShowGrid(False)
 	
+	def createItems(self, channelIndex):
+		self.setRowCount(len(self.parent.channels[channelIndex].episodes))
+		
+		for rowIndex, episode in enumerate(self.parent.channels[channelIndex].episodes):
+			episodeWidget = ChannelEpisodeWidget(episode, parent=self)
+			episodeWidget.addItems(self, rowIndex)
+	
 	@utils.qreclog
 	def onItemSelectionChanged(self):
-		selectedItem = self.selectedItems()[0]
-		self.parent.displayEpisodeDetails(selectedItem.row())
+		selectedItems = self.selectedItems()
+		if len(selectedItems) > 0:
+			selectedItem = selectedItems[0]
+			self.parent.displayEpisodeDetails(selectedItem.row())
+		else:
+			self.selectRow(0)
+			self.parent.displayEpisodeDetails(0)
 
 
 class ChannelDetailsView(SQt.VBox):
@@ -188,7 +177,7 @@ class AbosTab(QSplitter):
 	def __init__(self, **kwargs):
 		QSplitter.__init__(self, **kwargs)
 		
-		self.channels = [ChannelData("Example", "PyQt5", "Description", [ChannelEpisodeData("First Episode", "18.05.21", "03:22", "1:00", "Fred", "PyQt5", "Description")] * 100), ChannelData("Example 2", "PyQt4", "Description 2", [ChannelEpisodeData("First Episode", "19.05.21", "04:22", "1:00", "Frederic", "PyQt4", "Description 2")] * 100)] * 100
+		self.channels = [struct.ChannelData("Example", "PyQt5", "Description", [struct.ChannelEpisodeData("First Episode", "18.05.21", "03:22", "1:00", "Fred", "PyQt5", "Description")] * 100), struct.ChannelData("Example 2", "PyQt4", "Description 2", [struct.ChannelEpisodeData("First Episode", "19.05.21", "04:22", "1:00", "Frederic", "PyQt4", "Description 2")] * 100)] * 100
 		
 		self.channelsSplitter = QSplitter(self, orientation=Qt.Vertical)
 		self.addWidget(self.channelsSplitter)
@@ -209,34 +198,30 @@ class AbosTab(QSplitter):
 		self.episodesSplitter.addWidget(self.episodeDetailsView)
 		
 		self.updateAboList()
-		self.displayChannelDetails(0)
 	
 	@utils.qreclog
 	def updateAboList(self):
 		"""
 		Reload the list of channels
 		"""
-		self.channelsView.clear()
 		# TODO: tell plugins to update self.channels once plugins are implemented
-		self.channelsView.setRowCount(len(self.channels))
+		self.channelsView.createItems()
+		self.displayChannelDetails(0)
 		
-		for rowIndex, channel in enumerate(self.channels):
-			channelWidget = ChannelWidget(channel, parent=self.channelsView)
-			channelWidget.addItems(self.channelsView, rowIndex)
-	
 	@utils.qreclog
 	def displayChannelDetails(self, channelIndex):
 		"""Display the episodes of a channel in self.channels
-		@param channelIndex index of ChannelData in self.channels
+		@param channelIndex index of struct.ChannelData in self.channels
 		"""
 		self.currentChannelIndex = channelIndex
-		self.episodesView.clear()
-		self.episodesView.setRowCount(len(self.channels))
-		for rowIndex, episode in enumerate(self.channels[channelIndex].episodes):
-			episodeWidget = ChannelEpisodeWidget(episode, parent=self.episodesView)
-			episodeWidget.addItems(self.episodesView, rowIndex)
-		self.channelDetailsView.displayChannelDetails(self.channels[channelIndex])
 		
+		if len(self.channels) <= 0:
+			qApp.showStatusMessage("Cannot display channel details - channel list is empty", logging.ERROR)
+			return
+		
+		self.episodesView.createItems(channelIndex)
+		self.channelDetailsView.displayChannelDetails(self.channels[channelIndex])
+	
 	def displayEpisodeDetails(self, episodeIndex):
 		"""Display the description etc. of an episode in self.channels[channelIndex].episodes
 		@param episodeIndex index of EpisodeData in self.episodes

@@ -5,7 +5,7 @@ import sys
 import logging
 
 logging.basicConfig(
-	format='\n\n%(levelname)s at %(asctime)s from %(pathname)s:%(lineno)d: %(message)s',
+	format='\n\n%(levelname)s at %(asctime)s from %(pathname)s:%(lineno)d:\n\t%(message)s',
 	level=logging.WARNING
 )
 

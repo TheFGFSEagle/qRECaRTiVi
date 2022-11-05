@@ -8,6 +8,7 @@ import SimpleQt as SQt
 
 from qrecartivi import menus
 from qrecartivi.tabs import *
+from qrecartivi.statusbar import StatusBar
 
 
 class MainWindow(SQt.MainWindow):
@@ -18,7 +19,7 @@ class MainWindow(SQt.MainWindow):
 		self.fileMenu = menus.fileMenu()
 		self.mBar.addMenu(self.fileMenu)
 		
-		self.sBar = self.statusBar()
+		self.sBar = StatusBar()
 	
 	def initUI(self):
 		self.tabs = QTabWidget(self)

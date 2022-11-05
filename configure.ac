@@ -30,5 +30,5 @@ AS_IF([test ${CONVERT} = magick*], [
 
 
 AM_PATH_PYTHON([3.6])
-AC_CONFIG_FILES([Makefile tabs/Makefile images/Makefile])
+AC_CONFIG_FILES([Makefile qrecartivi/Makefile qrecartivi/addons/Makefile qrecartivi/tabs/Makefile qrecartivi/images/Makefile])
 AC_OUTPUT
