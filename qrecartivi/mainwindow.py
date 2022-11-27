@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 
 import SimpleQt as SQt
 
+import qrecartivi
 from qrecartivi import menus
 from qrecartivi.tabs import *
 from qrecartivi.statusbar import StatusBar
@@ -26,3 +27,6 @@ class MainWindow(SQt.MainWindow):
 		self.widget().addWidget(self.tabs)
 		self.abosTab = abos.AbosTab()
 		self.tabs.addTab(self.abosTab, "Abos")
+	
+	def closeEvent(self, event):
+		qrecartivi.app.quit()

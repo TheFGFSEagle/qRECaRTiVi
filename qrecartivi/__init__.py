@@ -19,18 +19,33 @@ import signal
 from PyQt5 import QtWidgets
 
 from qrecartivi.application import Application
+from qrecartivi.mainwindow import MainWindow
+from qrecartivi.trayicon import TrayIcon
+from qrecartivi.dialogs.settings import SettingsDialog
+from qrecartivi.addons.addonmanager import AddonManager
+
+app = None
+mainWindow = None
+trayIcon = None
+settingsDialog = None
+addonManager = None
 
 def main():
+	global app, mainWindow, trayIcon, settingsDialog, addonManager
+	
 	signal.signal(signal.SIGINT, signal.SIG_DFL)
-	QtWidgets.qApp = Application()
+	app = Application()
+	app.init()
 	
-	# DO NOT MOVE TO THE TOP - mainwindow must be imported AFTER overriding QtWidgets.qApp
-	from qrecartivi.mainwindow import MainWindow
-	QtWidgets.qApp.mainWindow = MainWindow()
-	QtWidgets.qApp.mainWindow.initUI()
-	QtWidgets.qApp.mainWindow.show()
-	# DO NOT MOVE TO THE TOP - trayicon must be imported AFTER creating main window
-	from qrecartivi.trayicon import TrayIcon
-	QtWidgets.qApp.trayIcon = TrayIcon()
+	mainWindow = MainWindow()
+	mainWindow.initUI()
+	mainWindow.show()
 	
-	sys.exit(QtWidgets.qApp.exec_())
+	trayIcon = TrayIcon()
+	trayIcon.initUI()
+	
+	settingsDialog = SettingsDialog()
+	
+	addonManager = AddonManager()
+	
+	sys.exit(app.exec_())

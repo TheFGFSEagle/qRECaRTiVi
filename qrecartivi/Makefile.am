@@ -1,4 +1,4 @@
-SUBDIRS = tabs images
+SUBDIRS = addons tabs images dialogs
 ACLOCAL_AMFLAGS = -I m4
 
 pymoddir = $(pythondir)/$(PACKAGE)

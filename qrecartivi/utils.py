@@ -5,8 +5,7 @@ import os
 import functools
 import logging
 import inspect
-
-from PyQt5.QtCore import QStandardPaths
+import appdirs
 
 logger = logging.getLogger()
 
@@ -32,19 +31,28 @@ Keyword arguments:
 qreclog = logFunctionOrMethodNameAndArgs
 
 @qreclog
-def getDatadir():
+def getDataDir():
 	"""Returns a path to the directory where data files should be saved
 	"""
-	custom_datadir = os.environ.get("QRECARTIVI_DATADIR", "")
-	if custom_datadir:
-		return custom_datadir
+	datadir = os.environ.get("QRECARTIVI_DATADIR", "")
+	if not datadir:
+		datadir = appdirs.user_data_dir("qrecartivi")
 	
-	datadir = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppDataLocation), "qrecartivi")
-	
-	if not os.path.isdir(datadir):
-		os.makedirs(datadir, exist_ok=True)
+	os.makedirs(datadir, exist_ok=True)
 	
 	return datadir
+
+@qreclog
+def getConfigDir():
+	"""Returns a path to the directory where data files should be saved
+	"""
+	configdir = os.environ.get("QRECARTIVI_CONFIGDIR", "")
+	if not configdir:
+		configdir = appdirs.user_config_dir("qrecartivi")
+	
+	os.makedirs(configdir, exist_ok=True)
+	
+	return configdir
 
 @qreclog
 def isPath(s):

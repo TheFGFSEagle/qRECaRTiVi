@@ -9,8 +9,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-from qrecartivi import resources
+from SimpleQt import settings
 
+from qrecartivi import resources, utils
+from qrecartivi.addons import addonmanager
 if not any([s in sys.argv for s in ("--style", "-style")]):
 	sys.argv += ["--style", "Fusion"]
 
@@ -26,14 +28,18 @@ class Application(QApplication):
 		self.setOrganizationName("Geisbergium")
 		self.setApplicationName("qRECaRTiVi")
 		self.setApplicationVersion("1.0")
-		self.loc = os.path.dirname(os.path.abspath(__file__)) + "/"
 		
 		self.getCommandLineArgs()
 		
-		self.settings = QSettings()
-		self.fontSize = self.settings.value("LookAndFeel/FontSize", 13)
-		self.fontFamily = self.settings.value("LookAndFeel/FontFamily", "Ubuntu")
+		settings.path = os.path.join(utils.getConfigDir(), "settings.json")
+		settings.load()
+	
+	def init(self):
+		self.fontSize = settings.get("gui/font-size", 13)
+		self.fontFamily = settings.get("gui/font-family", "Ubuntu")
 		self.setFont(QFont(self.fontFamily, self.fontSize))
+		
+		self.addonManager = addonmanager.AddonManager()
 	
 	def showStatusMessage(self, message, level):
 		getattr(
@@ -51,6 +57,7 @@ class Application(QApplication):
 			qApp.mainWindow.sBar.showMessage(message, level)
 	
 	def quit(self, *args, **kwargs):
+		settings.save()
 		QApplication.quit()
 	
 	def getCommandLineArgs(self):

@@ -7,14 +7,15 @@ from PyQt5.QtGui import *
 
 import SimpleQt as SQt
 
-from qrecartivi import menus
+import qrecartivi
 
 class TrayIcon(SQt.TrayIcon):
 	def __init__(self):
 		SQt.TrayIcon.__init__(self, iconFile=":/images/icon.png")
 	
-		menu = menus.trayMenu()
+	def initUI(self):
+		menu = qrecartivi.menus.trayMenu()
 		self.setContextMenu(menu)
 		self.show()
 		
-		self.clicked.connect(QtWidgets.qApp.mainWindow.toggle)
+		self.clicked.connect(qrecartivi.mainWindow.toggle)
