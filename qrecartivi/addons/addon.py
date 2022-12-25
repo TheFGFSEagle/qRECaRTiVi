@@ -7,7 +7,7 @@ class AddonException(Exception):
 
 class AddonRegisteredException(AddonException):
 	def __str__(self):
-		return f"AddonRegisteredException: addon {self.ident} is already registered"
+		return f"AddonRegisteredException: addon with ID {self.ident} is already registered"
 
 class AddonUnknownException(AddonException):
 	def __str__(self):
@@ -15,8 +15,8 @@ class AddonUnknownException(AddonException):
 
 
 class Addon:
-	def __init__(self):
-		pass
+	def __init__(self, cfg):
+		self.cfg = cfg
 	
 	def getChannels(self):
 		return []

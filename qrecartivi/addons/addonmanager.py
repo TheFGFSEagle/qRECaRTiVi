@@ -2,61 +2,87 @@
 #-*- coding:utf-8 -*-
 
 import os
-from importlib import import_module
+import sys
+import importlib.util
+from hashlib import md5
+
+from simple_singleton import Singleton
 
 from SimpleQt import settings
+
+from pyproptree import io
 
 from qrecartivi import utils
 from qrecartivi.addons import addon
 
-class AddonManager:
+class AddonManager(metaclass=Singleton):
+	_instance = None
 	def __init__(self):
-		self.__addons = []
-		self.custom_addon_paths = settings.get("addons/path", [])
+		self._addons = {}
+		settings.initNode("/addons/path", str, os.path.abspath(os.path.join(utils.getDataDir(), "addons")))
+		for i, path in enumerate(filter(None, os.environ.get("QRECARTIVI_ADDONPATH", "").split(os.pathsep))):
+			settings.initNode(f"/addons/path", str, os.path.abspath(path))
+		settings.addListener("/addons", self.updateAddons, True)
+		self.reloadAddons()
+	
+	def reloadAddons(self):
+		for ident in self._addons:
+			self._addons[ident].shutdown()
+		
+		for c in settings.getNode("/addons").getChildren("path"):
+			os.makedirs(c.getStringValue(), exist_ok=True)
+			for f in os.listdir(c.getStringValue()):
+				f = os.path.join(c.getStringValue(), f)
+				if f.endswith("addon.xml") and not os.path.isdir(f):
+					self.loadAddon(f)
+	
+	def updateAddons(self):
+		for addon in self._addons:
+			addon.update()
 	
 	def getAddonPaths(self):
-		paths = self.custom_addon_paths + [os.path.join(utils.getDataDir(), "addons")]
-		paths += list(filter(None, os.environ.get("QRECARTIVI_ADDONPATH", "").split(os.pathsep)))
-		return list(map(os.path.abspath, paths))
+		return list(map(lambda n: n.getStringValue(), settings.getNode("/addons").getChildren("path")))
 	
 	def addAddonPath(self, path):
-		if path not in self.custom_addon_paths:
-			self.custom_addon_paths.append(path)
-		self._write_custom_addon_paths_to_settings()
+		settings.initNode("/addons/path", str, path)
 	
 	def removeAddonPath(self, path):
-		if path in self.custom_addon_paths:
-			self.custom_addon_paths.remove(path)
-		self._write_custom_addon_paths_to_settings()
+		for n in settings.getNode("/addons").getChildren("path"):
+			if path == n.getStringValue():
+				n.remove()
 	
-	def _write_custom_addon_paths_to_settings(self):
-		qrecartivi.app.setting.set("addons/path", self.custom_addon_paths)
-		
-	def addAddon(self, ident):
-		if ident in self.__addons:
+	def getAddons(self):
+		return self._addons
+	
+	def loadAddon(self, path):
+		cfg = io.loadFile(path)
+		ident = cfg.getStringValue("ident", "addon_" + md5(path.encode("ascii")).hexdigest())
+		script = os.path.join(os.path.dirname(path), cfg.getStringValue("script", None))
+		module = "qrecartivi.addons." + ident
+		if ident == None:
+			raise ValueError("cannot add addon with empty script path")
+		if ident in self._addons:
 			raise addon.AddonRegisteredException(ident)
 		
-		oldPath = list(sys.path)
-		sys.path += self.getAddonPaths()
-		module = import_module(ident)
-		self.__addons[ident] = module.Addon()
-		self.__addons[ident].initialize()
-		sys.path = oldPath
+		settings.addNode(f"/addons/{ident}", cfg)
 		
-		qrecartivi.app.settings.set("addons/{ident}/enabled", True)
+		spec = importlib.util.spec_from_file_location(module, script)
+		sys.modules[module] = importlib.util.module_from_spec(spec)
+		spec.loader.exec_module(sys.modules[module])
+		self._addons[ident] = sys.modules[module].Addon(cfg)
+		cfg.initNode("enabled", bool, True)
 	
 	def toggleAddon(self, ident, state=None):
-		if ident not in self.__addons:
+		if ident not in self._addons:
 			raise addon.AddonUnknownException(ident)
 		
-		state = self.__addons[ident].toggleEnabled(state=state)
-		qrecartivi.app.settings.set("addons/{ident}/enabled", state)
+		state = self._addons[ident].cfg.getBoolValue("enabled", False)
+		self._addons[ident].cfg.setValue("enabled", not state)
 		return state
-		
+	
 	def removeAddon(self, ident):
-		if ident not in self.__addons:
+		if ident not in self._addons:
 			raise addon.AddonUnknownException(ident)
 		
-		self.__addons[ident].remove()
-		qrecartivi.app.settings.remove(f"addons/{ident}")
+		self._addons[ident].remove()
 

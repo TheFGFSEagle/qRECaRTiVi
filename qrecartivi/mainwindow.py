@@ -19,6 +19,8 @@ class MainWindow(SQt.MainWindow):
 		self.mBar = self.menuBar()
 		self.fileMenu = menus.fileMenu()
 		self.mBar.addMenu(self.fileMenu)
+		self.debugMenu = menus.debugMenu()
+		self.mBar.addMenu(self.debugMenu)
 		
 		self.sBar = StatusBar()
 	

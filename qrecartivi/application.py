@@ -5,14 +5,17 @@ import sys
 import os
 import logging
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import QFile, QIODevice, QTextStream, QCommandLineOption, QCommandLineParser
+from PyQt5.QtGui import QFont
+
+from plum import dispatch
 
 from SimpleQt import settings
 
 from qrecartivi import resources, utils
 from qrecartivi.addons import addonmanager
+
 if not any([s in sys.argv for s in ("--style", "-style")]):
 	sys.argv += ["--style", "Fusion"]
 
@@ -31,15 +34,26 @@ class Application(QApplication):
 		
 		self.getCommandLineArgs()
 		
-		settings.path = os.path.join(utils.getConfigDir(), "settings.json")
+		settings.path = os.path.join(utils.getConfigDir(), "settings.xml")
 		settings.load()
-	
-	def init(self):
-		self.fontSize = settings.get("gui/font-size", 13)
-		self.fontFamily = settings.get("gui/font-family", "Ubuntu")
-		self.setFont(QFont(self.fontFamily, self.fontSize))
+		
+		self.fontListener = settings.initNode("/gui/font").addListener(self.fontListenerCallback, True)
+		self.fontListenerCallback(settings.getNode("/gui/font"), None)
 		
 		self.addonManager = addonmanager.AddonManager()
+	
+	def fontListenerCallback(self, n, subn):
+		self.setFont(n.getStringValue("family", "Ubuntu"), n.getIntValue("size", 13))
+	
+	@dispatch
+	def setFont(self, family: str, size: int):
+		f = QFont(family, size)
+		self.setFont(f)
+	
+	@dispatch
+	def setFont(self, font: QFont):
+		if font.family() != self.font().family or font.pointSize() != self.font().pointSize() or font.pixelSize() != self.font().pixelSize():
+			QApplication.setFont(font, "QWidget")
 	
 	def showStatusMessage(self, message, level):
 		getattr(
